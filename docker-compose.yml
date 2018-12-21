@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  data:
+    build: ./data
+    volumes:
+      - server:/devpi/server
+      - server-upgrade:/devpi/server-upgrade
+
+  devpi:
+    restart: always
+    build: ./devpi
+    expose:
+      - 4040
+    volumes:
+      - server:/devpi/server
+      - server-upgrade:/devpi/server-upgrade
+    networks:
+      - devpinet
+
+  nginx:
+    restart: always
+    build:
+        context: ./nginx
+        args:
+            OUTER_PORT: 6970
+    ports:
+      - 6970:8080
+    volumes:
+      - server:/devpi/server
+      - server-upgrade:/devpi/server-upgrade
+    depends_on:
+      - devpi
+    networks:
+      - devpinet
+
+networks:
+  devpinet:
+      driver: bridge
+
+volumes:
+  server:
+  server-upgrade:
