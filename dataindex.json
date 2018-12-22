@@ -1,0 +1,49 @@
+{
+  "users": {
+    "root": {
+      "pwhash": "$argon2i$v=19$m=102400,t=2,p=8$odQ6h7C29r43xnhPaa31Xg$aAPhuASstUd0KE7b8C+TDQ",
+      "username": "root"
+    }
+  },
+  "indexes": {
+    "root/pypi": {
+      "indexconfig": {
+        "type": "mirror",
+        "volatile": false,
+        "title": "PyPI",
+        "mirror_url": "https://pypi.org/simple/",
+        "mirror_web_url_fmt": "https://pypi.org/project/{name}/"
+      }
+    },
+    "root/qa": {
+      "indexconfig": {
+        "type": "stage",
+        "volatile": true,
+        "bases": [
+          "root/pypi"
+        ],
+        "acl_upload": [
+          "root"
+        ],
+        "acl_toxresult_upload": [
+          ":ANONYMOUS:"
+        ],
+        "mirror_whitelist": [],
+        "pypi_whitelist": []
+      },
+      "projects": {},
+      "files": []
+    }
+  },
+  "dumpversion": "2",
+  "pythonversion": [
+    3,
+    6,
+    6,
+    "final",
+    0
+  ],
+  "devpi_server": "4.8.0",
+  "secret": "J6I2VNLp7G207Ehw/WrhTW/xKRsWfHIYG4Wo9MOF51E=",
+  "uuid": "b72d2d92295542b698f2aa8d538f940a"
+}
