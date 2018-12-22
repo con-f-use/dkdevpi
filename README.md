@@ -5,6 +5,7 @@ Docker-compose setup to run a local Python Package Index (PI).
 Runs a [devpi][dp] container behind an [Nginx][nx] instance for maximal modularity.
 For a small footprint the base of all the containers is [Alpine][al].
 
+![diagram](docker_devpi.png)
 
 ## Running an instance
 
@@ -38,9 +39,10 @@ initialized.
 The same process is used to rebuild and restart the containers
 after changes were made. The volumes should not be affected.
 
-## Saving the Server Data and Configuration
+## Saving the Server Configuration
 
-You can [export and re-import the data][1] all devpi data.
+You can [export and re-import all devpi data][1] (except for
+the cached packages).
 Exporting is done by running:
 
 ```
@@ -51,14 +53,17 @@ docker run --rm \
   dockerdevpi_devpi \
   devpi-server --serverdir /devpi/server --export /dump/$DUMPDIR
 ```
-
 The dumped data is now in a folder called `dump-XXXX` where XXXX
 is a timestamp of when the dump was made.
 
-Now you can import the old server state to a different server
-directory:
+If you want to backup the cached files as well, do something
+akin to `docker cp dockerdevpi_data_1:devpi/server/ $DUMPDIR/`
+
+You can import the old server state to a different server
+directory or one that you have rebuild:
 ```
 docker-compose stop devpi nginx
+docker-compose build   # If you changed the Dockerimage
 docker run --rm \
   --volumes-from=dockerdevpi_data_1 \
   -v $(pwd)/$DUMPDIR:/dump \
@@ -67,7 +72,7 @@ docker run --rm \
 ```
 Completion of the import might take a long time depending on the
 filesizes.
-You can test if the import works by starting another container
+To test if the import works, start another container
 with the new directory:
 ```
 docker run --rm -ti \
@@ -78,7 +83,7 @@ docker run --rm -ti \
 ```
 If `http://localhost:8080/` looks fine, press `CTRL+C` to stop the test.
 
-You can now run the `./devpi/upgrade.sh` shellscript insde the new
+Run the `./devpi/upgrade.sh` shellscript insde the new
 container and restart the setup.
 ```
 docker run --rm \
@@ -100,4 +105,3 @@ All rights reserved for now.
 [1]: http://doc.devpi.net/latest/quickstart-server.html#versioning-exporting-and-importing-server-state
 [dp]: https://www.devpi.net
 [nx]: https://nginx.org
-
