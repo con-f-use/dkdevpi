@@ -35,4 +35,4 @@ COPY run.sh /devpi/
 
 # Entry point
 EXPOSE 4040
-CMD ["sh", "-c", "/devpi/run.sh"]
+CMD ["/bin/sh", "/devpi/run.sh"]
