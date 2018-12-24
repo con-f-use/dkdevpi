@@ -15,10 +15,10 @@
         "mirror_web_url_fmt": "https://pypi.org/project/{name}/"
       }
     },
-    "root/qa": {
+    "root/production": {
       "indexconfig": {
         "type": "stage",
-        "volatile": true,
+        "volatile": false,
         "bases": [
           "root/pypi"
         ],
@@ -26,9 +26,30 @@
           "root"
         ],
         "acl_toxresult_upload": [
-          ":ANONYMOUS:"
+          "root"
         ],
         "mirror_whitelist": [],
+        "pypi_whitelist": []
+      },
+      "projects": {},
+      "files": []
+    },
+    "root/test": {
+      "indexconfig": {
+        "title": "Test Index",
+        "description": "Everything goes here, YOLO",
+        "type": "stage",
+        "volatile": true,
+        "bases": [
+          "root/pypi", "root/production"
+        ],
+        "acl_upload": [
+          ":ANONYMOUS:"
+        ],
+        "acl_toxresult_upload": [
+          ":ANONYMOUS:"
+        ],
+        "mirror_whitelist": ["*"],
         "pypi_whitelist": []
       },
       "projects": {},

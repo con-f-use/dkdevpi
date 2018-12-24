@@ -1,5 +1,4 @@
 FROM alpine:3.8
-LABEL maintainer Jan Christoph Bischko <jbischko@barracuda.com>
 
 # Disable output stream buffering
 ENV PYTHONUNBUFFERED=1
@@ -13,6 +12,8 @@ RUN apk add --no-cache --virtual .build-deps gcc=6.4.0-r9 libffi-dev=3.2.1-r4 mu
         "devpi-client>=4.2.0,<4.3" && \
     apk del .build-deps gcc libffi-dev musl-dev openssl-dev python3-dev
 
+# devpi-ldap
+# devpi-builder
 
 # Create devpi user
 RUN adduser -D devpi \
@@ -23,18 +24,15 @@ RUN adduser -D devpi \
 RUN cp -R /usr/lib/python3.*/site-packages/devpi_web/static /devpi/+static
 
 # Add upgrade script
-ADD upgrade.sh /devpi/
+COPY upgrade.sh /devpi/
 
 # Expose volume
 VOLUME ["/devpi/server"]
 
 # Change to unprivileged user
 USER devpi
+COPY run.sh /devpi/
 
 # Entry point
 EXPOSE 4040
-CMD ["devpi-server", \
-     "--host", "0.0.0.0", \
-     "--port", "4040", \
-     "--serverdir", "/devpi/server", \
-     "--restrict-modify", "root"]
+CMD ["sh", "-c", "/devpi/run.sh"]

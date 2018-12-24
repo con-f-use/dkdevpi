@@ -1,5 +1,4 @@
 FROM alpine:3.8
-LABEL maintainer Jan Christoph Bischko <jbischko@barracuda.com>
 
 # Outward facing port (overwritten by ../docker-compose.yml)
 ARG OUTER_PORT=8080

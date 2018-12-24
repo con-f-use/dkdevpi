@@ -13,12 +13,15 @@ First thing you will have to decide under which outward facing port
 you want your package index to be reachable.
 This port is referred to as the `OUTER_PORT` in the docker and
 docker-compose files.
-You can just change it in `./docker-compose.yml` of live with the
+You can just change it in `./.env` or live with the
 default of 6970 (decimal value of ASCII chars "pi").
 
 After that, run:
 
 ```
+export GIT_VERSION=$(git rev-parse --abbrev-ref HEAD).$(git describe --always --dirty --abbrev)
+export GIT_SHA=$(git rev-parse HEAD)
+export BUILD_DATE=$(date --rfc-3339=seconds)
 docker-compose build
 docker-compose up -d
 ```

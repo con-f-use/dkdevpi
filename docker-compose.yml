@@ -1,15 +1,35 @@
-version: '3'
+version: '3.3'
 
 services:
   data:
-    build: ./data
+    build:
+      context: ./data
+      labels:
+        maintainer: "${MAINTAINER}"
+        org.label-schema.schema-version: "1.0"
+        org.label-schema.description: "Convenience container for a local, caching, python package index setup"
+        org.label-schema.url: "${PROJECT_URL}"
+        org.label-schema.vcs: "${GIT_SHA}"
+        org.label-schema.version: "${GIT_VERSION}"
+        org.label-schema.build-date: "${BUILD_DATE}"
+        org.label-schema.docker.cmd: "docker-compose"
     volumes:
       - server:/devpi/server
       - server-upgrade:/devpi/server-upgrade
 
   devpi:
     restart: always
-    build: ./devpi
+    build:
+      context: ./devpi
+      labels:
+        maintainer: "${MAINTAINER}"
+        org.label-schema.schema-version: "1.0"
+        org.label-schema.description: "Local, caching, python package index"
+        org.label-schema.url: "${PROJECT_URL}"
+        org.label-schema.vcs: "${GIT_SHA}"
+        org.label-schema.version: "${GIT_VERSION}"
+        org.label-schema.build-date: "${BUILD_DATE}"
+        org.label-schema.docker.cmd: "docker-compose"
     expose:
       - 4040
     volumes:
@@ -21,11 +41,20 @@ services:
   nginx:
     restart: always
     build:
-        context: ./nginx
-        args:
-            OUTER_PORT: 6970
+      context: ./nginx
+      args:
+          OUTER_PORT: ${OUTER_PORT}
+      labels:
+        maintainer: "${MAINTAINER}"
+        org.label-schema.schema-version: "1.0"
+        org.label-schema.description: "Load balancer for a local, caching, python package index setup"
+        org.label-schema.url: "${PROJECT_URL}"
+        org.label-schema.vcs: "${GIT_SHA}"
+        org.label-schema.version: "${GIT_VERSION}"
+        org.label-schema.build-date: "${BUILD_DATE}"
+        org.label-schema.docker.cmd: "docker-compose"
     ports:
-      - 6970:8080
+      - ${OUTER_PORT}:8080
     volumes:
       - server:/devpi/server
       - server-upgrade:/devpi/server-upgrade
