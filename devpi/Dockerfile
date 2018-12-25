@@ -16,15 +16,18 @@ RUN apk add --no-cache --virtual .build-deps gcc=6.4.0-r9 libffi-dev=3.2.1-r4 mu
 # devpi-builder
 
 # Create devpi user
-RUN adduser -D devpi \
-    && mkdir /devpi \
-    && chown -R devpi:devpi /devpi
+RUN adduser -D devpi && \
+    mkdir /devpi
 
-# Copy static files (pash changes with python version)
-RUN cp -R /usr/lib/python3.*/site-packages/devpi_web/static /devpi/+static
+# Copy static files (path changes with python version)
+RUN cp -R /usr/lib/python3.*/site-packages/devpi_web/templates /devpi/templates && \
+    cp -R /usr/lib/python3.*/site-packages/devpi_web/static /devpi/+static && \
+    ln -s /devpi/+static /devpi/static && \
+    chown -R devpi:devpi /devpi
 
 # Add upgrade script
 COPY upgrade.sh /devpi/
+COPY dataindex.json /devpi/
 
 # Expose volume
 VOLUME ["/devpi/server"]
@@ -33,6 +36,14 @@ VOLUME ["/devpi/server"]
 USER devpi
 COPY run.sh /devpi/
 
+# Inculde git version in web-interface (from docker compose)
+ARG GIT_VERSION=unknown
+ARG PROJECT_NAME=unknown
+RUN sed -i -E \
+    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~\1\n        <li>'${PROJECT_NAME}'-'${GIT_VERSION}'</li>~' \
+    devpi/templates/macros.pt
+
 # Entry point
 EXPOSE 4040
 CMD ["/bin/sh", "/devpi/run.sh"]
+
