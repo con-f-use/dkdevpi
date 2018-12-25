@@ -39,8 +39,9 @@ COPY run.sh /devpi/
 # Inculde git version in web-interface (from docker compose)
 ARG GIT_VERSION=unknown
 ARG PROJECT_NAME=unknown
+ARG PROJECT_URL=unknown
 RUN sed -i -E \
-    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~\1\n        <li>'${PROJECT_NAME}'-'${GIT_VERSION}'</li>~' \
+    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~<li>'${PROJECT_NAME}'-'${GIT_VERSION}' ('${PROJECT_URL}')</li>\n        \1~' \
     devpi/templates/macros.pt
 
 # Entry point

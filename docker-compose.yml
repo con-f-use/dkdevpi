@@ -24,6 +24,7 @@ services:
       args:
           GIT_VERSION: ${GIT_VERSION}
           PROJECT_NAME: ${PROJECT_NAME}
+          PROJECT_URL: ${PROJECT_URL}
       labels:
         maintainer: "${MAINTAINER}"
         org.label-schema.schema-version: "1.0"
