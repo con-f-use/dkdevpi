@@ -30,13 +30,12 @@ If the `devpidocker-data` container does not already contain
 a server configuration, then you'll have to add the `--init`
 option to the `devpi-server` call, restart the container,
 remove the option again, and restart the container again.
-**ToDo: Run via script that does this automatically.**
 
 If you used the default port, devpi should be reachable under:
 http://localhost:6970/.
 
 **Note:** devpi may display some error messages on the webui.
-The should disappear after some minutes, when the database is
+They should disappear after some minutes, when the database is
 initialized.
 
 The same process is used to rebuild and restart the containers
