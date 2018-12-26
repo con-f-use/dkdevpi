@@ -41,7 +41,7 @@ ARG GIT_VERSION=unknown
 ARG PROJECT_NAME=unknown
 ARG PROJECT_URL=unknown
 RUN sed -i -E \
-    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~<li>'${PROJECT_NAME}'-'${GIT_VERSION}' ('${PROJECT_URL}')</li>\n        \1~' \
+    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~<li><a href="'${PROJECT_URL}'">'${PROJECT_NAME}'-'${GIT_VERSION}'</a></li>\n        \1~' \
     devpi/templates/macros.pt
 
 # Entry point
