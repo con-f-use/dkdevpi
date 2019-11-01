@@ -1,101 +1,53 @@
-# QA devpi
+# dkdevpi
 
 Docker-compose setup to run a local Python Package Index (PI).
 
-Runs a [devpi][dp] container behind an [Nginx][nx] instance for maximal modularity.
-For a small footprint the base of all the containers is [Alpine][al].
+Runs a [devpi][dp] container and a [replica][rep]
+behind an [Nginx][nx] instance for maximal modularity.
+Per default it caches the real Python Package index at pypi.org.
+Packages that do not exist locally will be forwarded from there.
+LDAP authentication is enabled for `root/test`.
 
-![diagram](docker_devpi.png)
+[Video: Release Management with Devpi][erb]
 
-## Running an instance
+![diagram](docker_layout.png)
 
-First thing you will have to decide under which outward facing port
-you want your package index to be reachable.
-This port is referred to as the `OUTER_PORT` in the docker and
-docker-compose files.
-You can just change it in `./.env` or live with the
-default of 6970 (decimal value of ASCII chars "pi").
 
-After that, run:
+# Running an instance
 
-```
-export GIT_VERSION=$(git rev-parse --abbrev-ref HEAD).$(git describe --always --dirty --abbrev)
-export GIT_SHA=$(git rev-parse HEAD)
-export BUILD_DATE=$(date --rfc-3339=seconds)
-docker-compose build
-docker-compose up -d
-```
+First you will have to copy `template_.env` to `.env` in the project root 
+and edit the latter  to your linking.
 
-If the `devpidocker-data` container does not already contain
-a server configuration, then you'll have to add the `--init`
-option to the `devpi-server` call, restart the container,
-remove the option again, and restart the container again.
+Then you should generade an ssl certificate and key named `./nginx/dkdevpi.crt`/`.key` respectively.
+You will probably want to generate it for both an IP and several DNS names and sign it with a root certificate.
+That can be achieved most easily with a GUI-tool like [xca](xca)
 
-If you used the default port, devpi should be reachable under:
-http://localhost:6970/.
+After that, try your luck with `build.sh run`.
+Remember `docker logs <containername>` is your friend and its `-f` and `--tail <number_of_lines>` options are, too.
 
-**Note:** devpi may display some error messages on the webui.
-They should disappear after some minutes, when the database is
-initialized.
-
-The same process is used to rebuild and restart the containers
-after changes were made. The volumes should not be affected.
-
-## Saving the Server Configuration
-
-You can [export and re-import all devpi data][1] (except for
-the cached packages).
-Exporting is done by running:
+If everything went well, and you did not change the port setup, your package index should be reachable under:
 
 ```
-export DUMPDIR=dump-$(date +%Y%m%d-%H%M%S)
-docker run --rm \
-  --volumes-from=dockerdevpi_data_1 \
-  -v $(pwd):/dump \
-  dockerdevpi_devpi \
-  devpi-server --serverdir /devpi/server --export /dump/$DUMPDIR
+http://localhost:6970/
+https://localhost:6943/
 ```
-The dumped data is now in a folder called `dump-XXXX` where XXXX
-is a timestamp of when the dump was made.
 
-If you want to backup the cached files as well, do something
-akin to `docker cp dockerdevpi_data_1:devpi/server/ $DUMPDIR/`
+#### Reset root password
 
-You can import the old server state to a different server
-directory or one that you have rebuild:
-```
-docker-compose stop devpi nginx
-docker-compose build   # If you changed the Dockerimage
-docker run --rm \
-  --volumes-from=dockerdevpi_data_1 \
-  -v $(pwd)/$DUMPDIR:/dump \
-  dockerdevpi_devpi \
-  devpi-server --serverdir /devpi/server-upgrade --import /dump
-```
-Completion of the import might take a long time depending on the
-filesizes.
-To test if the import works, start another container
-with the new directory:
-```
-docker run --rm -ti \
-    --volumes-from=dockerdevpi_data_1 \
-    -p 8080:4040 \
-    dockerdevpi_devpi \
-    devpi-server --host 0.0.0.0 --port 4040 --serverdir /devpi/server-upgrade
-```
-If `http://localhost:8080/` looks fine, press `CTRL+C` to stop the test.
+Inside the devpi container run:
 
-Run the `./devpi/upgrade.sh` shellscript insde the new
-container and restart the setup.
 ```
-docker run --rm \
-    --volumes-from=dockerdevpi_data_1 \
-    dockerdevpi_devpi \
-    /bin/sh /devpi/upgrade.sh
-docker-compose up -d
+devpi-server --serverdir=/devpi/server --passwd root
 ```
-Do not forget to cleanup the leftover containers from the previous steps.
-They should have exited.
+
+
+# ToDo
+
+- More and better documentation, sorry.
+- Incorporate letsencrypt if no certificate provided
+- Look into an actual devpi_ plugin for the modified theme
+  * ...that allows changing a few strings in template
+  * ...and doesn't need the `sed` hack
 
 # License
 This is a personal project.
@@ -107,3 +59,4 @@ All rights reserved for now.
 [1]: http://doc.devpi.net/latest/quickstart-server.html#versioning-exporting-and-importing-server-state
 [dp]: https://www.devpi.net
 [nx]: https://nginx.org
+[xca]: https://sourceforge.net/projects/xca/

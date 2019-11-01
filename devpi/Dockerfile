@@ -1,51 +1,44 @@
-FROM alpine:3.8
+FROM devpi_base:latest
 
-# Disable output stream buffering
-ENV PYTHONUNBUFFERED=1
-
-# Install devpi
-RUN apk add --update python3=3.6.6-r0
-RUN apk add --no-cache --virtual .build-deps gcc=6.4.0-r9 libffi-dev=3.2.1-r4 musl-dev=1.1.19-r10 openssl-dev=1.0.2q-r0 python3-dev=3.6.6-r0 && \
-    pip3 install \
-        "devpi-server>=4.8.0,<4.9" \
-        "devpi-web>=3.5.0,<3.6" \
-        "devpi-client>=4.2.0,<4.3" && \
-    apk del .build-deps gcc libffi-dev musl-dev openssl-dev python3-dev
-
-# devpi-ldap
-# devpi-builder
-
-# Create devpi user
-RUN adduser -D devpi && \
-    mkdir /devpi
+# Scripts and necessary data
+RUN  mkdir /devpi/devpi_semantic_ui/
+COPY . /devpi/
 
 # Copy static files (path changes with python version)
-RUN cp -R /usr/lib/python3.*/site-packages/devpi_web/templates /devpi/templates && \
-    cp -R /usr/lib/python3.*/site-packages/devpi_web/static /devpi/+static && \
-    ln -s /devpi/+static /devpi/static && \
-    chown -R devpi:devpi /devpi
+RUN ln -s /devpi/static /devpi/+static && \
+    ls /devpi/ && \
+    chown -R devpi /devpi && \
+    chmod ug+x /devpi/*.sh
+# For regular theme:
+#RUN cp -R /usr/lib/python3.*/site-packages/devpi_web/static /devpi/+static
 
-# Add upgrade script
-COPY upgrade.sh /devpi/
-COPY dataindex.json /devpi/
-
-# Expose volume
-VOLUME ["/devpi/server"]
 
 # Change to unprivileged user
 USER devpi
-COPY run.sh /devpi/
 
 # Inculde git version in web-interface (from docker compose)
 ARG GIT_VERSION=unknown
 ARG PROJECT_NAME=unknown
 ARG PROJECT_URL=unknown
 ARG BUILD_DATE=unknown
+ARG LDAP_SEARCH_PASSWORD=unknown
 RUN sed -i -E \
-    's~(<li tal:repeat="vi version_infos">\$\{vi\[0\]\}-\$\{vi\[1\]\}</li>)~<li><a href="'${PROJECT_URL}'">'${PROJECT_NAME}'-'${GIT_VERSION}'</a> ('"${BUILD_DATE}"')</li>\n        \1~' \
-    devpi/templates/macros.pt
+      's~\{\{PROJECT_URL\}\}~'${PROJECT_URL}'~' \
+      /devpi/devpi_semantic_ui/templates/layout.pt; \
+    sed -i -E \
+      's~\{\{PROJECT_NAME\}\}~'${PROJECT_NAME}'~' \
+      /devpi/devpi_semantic_ui/templates/layout.pt; \
+    sed -i -E \
+      's~\{\{GIT_VERSION\}\}~'${GIT_VERSION}'~' \
+      /devpi/devpi_semantic_ui/templates/layout.pt; \
+    sed -i -E \
+      's~\{\{BUILD_DATE\}\}~'"${BUILD_DATE}"'~' \
+      /devpi/devpi_semantic_ui/templates/layout.pt; echo BUILD_DATE: ${BUILD_DATE}; \
+    sed -i -E \
+	  's~\{\{LDAP_SEARCH_PASSWORD\}\}~'${LDAP_SEARCH_PASSWORD}'~' \
+	  /devpi/devpi-ldap.yaml
 
 # Entry point
 EXPOSE 4040
-CMD ["/bin/sh", "/devpi/run.sh"]
+CMD ["/devpi/run.sh"]
 

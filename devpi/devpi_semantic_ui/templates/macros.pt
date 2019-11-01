@@ -1,0 +1,27 @@
+<metal:headcss define-macro="headcss">
+    <link rel="stylesheet" type="text/css" href="${request.theme_static_url('semantic.min.css')}" />
+    <link rel="stylesheet" type="text/css" href="${request.theme_static_url('devpi-semantic.css')}" />
+    <link rel="stylesheet" type="text/css" href="${request.theme_static_url('pygments.css')}" />
+</metal:headcss>
+
+<metal:headscript define-macro="headscript" use-macro="request.macros['original-headscript']">
+    <metal:semantic_js fill-slot="headscript">
+        <script src="${request.theme_static_url('semantic.min.js')}"></script>
+        <script src="${request.theme_static_url('devpi-semantic.js')}"></script>
+    </metal:semantic_js>
+</metal:headscript>
+
+<metal:statusbadge define-macro="statusbadge"
+    tal:define="colors {'ok': 'green', 'warn': 'orange', 'fatal': 'red'};
+                color colors.get(request.status_info.status)">
+    <a class="ui label"
+        href="${request.status_info.url}">
+        Server status
+        <div class="detail">
+            <i class="checkmark ${color} icon" tal:condition="request.status_info.status == 'ok'"></i>
+            <i class="warning ${color} icon" tal:condition="request.status_info.status == 'warn'"></i>
+            <i class="remove ${color} icon" tal:condition="request.status_info.status == 'fatal'"></i>
+            ${request.status_info.short_msg}
+        </div>
+    </a>
+</metal:statusbadge>

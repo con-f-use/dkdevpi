@@ -1,0 +1,39 @@
+<metal:layout use-macro="load: layout.pt">
+    <metal:content metal:fill-slot="content">
+        <div class="ui divided items" tal:condition="result|None">
+            <div class="item" tal:repeat="item result['items']">
+                <div class="content">
+                    <a class="header" tal:attributes="href item.url">${item.title}</a>
+                    <div class="description">
+                        <p></p>
+                        <p></p>
+                    </div>
+                    <div class="extra">
+                        <i class="fork icon"></i>
+                        ${item.data.path}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui center aligned basic segment">
+            <div class="ui pagination menu" tal:condition="batch_links|None">
+                <a tal:repeat="link [l for l in batch_links if l.get('title')]"
+                    tal:attributes="
+                    href link.get('url');
+                    class link.get('class', 'item')
+                    .replace('current', 'item active')
+                    .replace('prev', 'item')
+                    .replace('next', 'item')
+
+                    ">
+                    ${link.title}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui center aligned segment" tal:condition="not result|None">
+            <p>Your search <strong>${query}</strong> did not match anything.</p>
+        </div>
+
+    </metal:content>
+</metal:layout>

@@ -1,0 +1,65 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.fixed.menu .item img.logo {
+    margin-right: 1.5em;
+}
+
+.fixed.menu form.search {
+    width: 100%;
+}
+
+.ui.category.search > .results .category > .name {
+    width: 180px;
+    padding: .8em 1em;
+}
+
+.ui.category.search > .results .category .result {
+    margin-left: 180px;
+}
+
+.submenu {
+    background-color: #FAFAFA;
+    margin-top: 4em;
+    padding: 1em 0em;
+    border-bottom: 1px solid #ebe7e7;
+}
+
+.ui.main.container {
+    flex: 1;
+}
+
+.footer.segment {
+    padding: 5em 0em;
+}
+
+td.toxresults .mini.ui.button {
+    padding: 0.5em 1.1em 0.5em;
+}
+
+td.toxresults > .mini.ui.button {
+    margin-bottom: 0.5em;
+}
+
+.toxresult .command .title {
+    font-size: 0.85em;
+}
+
+.toxresult .command pre {
+    background-color: #1b1c1d;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.toxresult {
+    margin-top: 3em;
+}
+
+iframe {
+    display: block;
+    border: none;
+}

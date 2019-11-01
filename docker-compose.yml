@@ -1,26 +1,39 @@
 version: '3.3'
 
 services:
-  data:
+  devpi:
+    restart: always
     build:
-      context: ./data
+      context: ./devpi
+      args:
+          GIT_VERSION: ${GIT_VERSION}
+          PROJECT_NAME: ${PROJECT_NAME}
+          PROJECT_URL: ${PROJECT_URL}
+          BUILD_DATE: ${BUILD_DATE}
+          LDAP_SEARCH_PASSWORD: ${LDAP_SEARCH_PASSWORD}
       labels:
         maintainer: "${MAINTAINER}"
         org.label-schema.schema-version: "1.0"
-        org.label-schema.description: "Convenience container for a local, caching, python package index setup"
+        org.label-schema.description: "Local, caching, python package index"
         org.label-schema.url: "${PROJECT_URL}"
         org.label-schema.vcs: "${GIT_SHA}"
         org.label-schema.version: "${GIT_VERSION}"
         org.label-schema.build-date: "${BUILD_DATE}"
         org.label-schema.docker.cmd: "docker-compose"
+    expose:
+      - 4040
+    ports:
+      - 6969:4040
     volumes:
       - server:/devpi/server
       - server-upgrade:/devpi/server-upgrade
+    networks:
+      - devpinet
 
-  devpi:
+  areplica:
     restart: always
     build:
-      context: ./devpi
+      context: ./replica
       args:
           GIT_VERSION: ${GIT_VERSION}
           PROJECT_NAME: ${PROJECT_NAME}
@@ -35,11 +48,15 @@ services:
         org.label-schema.version: "${GIT_VERSION}"
         org.label-schema.build-date: "${BUILD_DATE}"
         org.label-schema.docker.cmd: "docker-compose"
+    environment:
+      - REP_PORT=4041
+      - MASTER_URL=http://devpi:4040
     expose:
-      - 4040
-    volumes:
-      - server:/devpi/server
-      - server-upgrade:/devpi/server-upgrade
+      - 4041
+    ports:
+      - 6971:4041
+    depends_on:
+      - devpi
     networks:
       - devpinet
 
@@ -49,6 +66,7 @@ services:
       context: ./nginx
       args:
           OUTER_PORT: ${OUTER_PORT}
+          OUTER_SSL_PORT: ${OUTER_SSL_PORT}
       labels:
         maintainer: "${MAINTAINER}"
         org.label-schema.schema-version: "1.0"
@@ -60,6 +78,7 @@ services:
         org.label-schema.docker.cmd: "docker-compose"
     ports:
       - ${OUTER_PORT}:8080
+      - ${OUTER_SSL_PORT}:8443
     volumes:
       - server:/devpi/server
       - server-upgrade:/devpi/server-upgrade

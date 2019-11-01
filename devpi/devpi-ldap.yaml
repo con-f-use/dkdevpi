@@ -1,0 +1,9 @@
+---
+devpi-ldap:
+  url: ldaps://<some_server>:636
+  user_search:
+    userdn: someuser@<someserver>
+    password: {{LDAP_SEARCH_PASSWORD}} 
+    base: DC=EU,DC=AD,DC=<MY-ORGANIZATION>,DC=COM
+    filter: (&(objectClass=user)(userPrincipalName={username}))
+    attribute_name: distinguishedName
