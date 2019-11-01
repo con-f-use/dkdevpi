@@ -24,6 +24,9 @@ That can be achieved most easily with a GUI-tool like [xca](xca)
 
 After that, try your luck with `build.sh run`.
 Remember `docker logs <containername>` is your friend and its `-f` and `--tail <number_of_lines>` options are, too.
+Some packages inside the Dockerfiles are version-pinned.
+That might cause their installation to fail as they are no longer available in that version.
+Should that be the case, try to replace them with a more recent one and test the resulting setup carefully.
 
 If everything went well, and you did not change the port setup, your package index should be reachable under:
 
