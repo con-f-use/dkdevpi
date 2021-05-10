@@ -30,8 +30,7 @@
         "description": "All packages here should be cleaned and tested.",
         "bases": [
           "root/pypi"
-        ],
-        "pypi_whitelist": []
+        ]
       },
       "projects": {},
       "files": []
@@ -54,8 +53,7 @@
         "bases": [
           "root/pypi",
           "root/stable"
-        ],
-        "pypi_whitelist": []
+        ]
       },
       "projects": {},
       "files": []
@@ -74,8 +72,7 @@
           "root/pypi",
           "root/stable"
         ],
-        "mirror_whitelist": [],
-        "pypi_whitelist": [],
+        "mirror_whitelist": []
         "description": "Tested, semi-stable packages go here.",
         "title": "Development Index"
       },
