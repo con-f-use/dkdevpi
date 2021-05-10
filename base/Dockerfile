@@ -19,8 +19,12 @@ ARG BUILD_DEPS=" \
 ARG DEVPI_PKGS=" \
     devpi-server==5.2.0 \
     devpi-web==4.0.0 \
-    devpi-ldap==1.2.2\
+    devpi-ldap==1.2.2 \
+    devpi-jenkins==2.0.0 \
     "
+# Exect versions are specified, because otherwise what is in the image
+# depends on what was the latest version at the time it was build.
+# I.e. the image builds are not exaclty reproducible, without version pinning.
 
 # Install devpi
 RUN \
